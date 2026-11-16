@@ -423,21 +423,21 @@ export default function Payment() {
               <div className="pt-2 text-center text-sm text-gray-400">
                 Cần hỗ trợ kích hoạt gấp? Nhắn Zalo:{' '}
                 <a
-                  href={FOUNDERS[0].zaloLink}
+                  href="https://zalo.me/0357722698"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-mystic-300 font-bold hover:underline"
+                  className="text-emerald-400 font-bold hover:underline"
                 >
-                  {FOUNDERS[0].phone} (Quang - Founder)
+                  0357722698 (Quang - Founder)
                 </a>{' '}
-                hoặc{' '}
+                hoặc Telegram:{' '}
                 <a
-                  href={FOUNDERS[1].zaloLink}
+                  href="https://t.me/muarebandatggaiprocapcutprocvasp"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-mystic-300 font-bold hover:underline"
+                  className="text-sky-400 font-bold hover:underline"
                 >
-                  {FOUNDERS[1].phone} (Hoàng - Co-Founder)
+                  Hoàng James (Co-Founder)
                 </a>
               </div>
             </div>

@@ -79,8 +79,8 @@ export const FOUNDERS = [
     name: 'Trần Nhật Quang',
     role: 'Founder',
     phone: '0357722698',
+    zalo: '0357722698',
     zaloLink: 'https://zalo.me/0357722698',
-    facebookLink: 'https://www.facebook.com/tran.nhatquang.5686?rdid=AhLsDHX0R6eqsJay&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F19vhp59qQm%23',
     bankName: 'Eximbank',
     accountNumber: '0357722698',
     accountHolder: 'TRAN NHAT QUANG',
@@ -89,11 +89,8 @@ export const FOUNDERS = [
     name: 'Hoàng James',
     role: 'Co-Founder',
     phone: '0334164570',
-    zaloLink: 'https://zalo.me/0334164570',
-    facebookLink: 'https://www.facebook.com/hoang.james.78087',
-    bankName: 'MB Bank',
-    accountNumber: '0334164570',
-    accountHolder: 'HOANG JAMES',
+    telegram: '@muarebandatggaiprocapcutprocvasp',
+    telegramLink: 'https://t.me/muarebandatggaiprocapcutprocvasp',
   },
 ]
 
@@ -140,6 +137,12 @@ export function getProductImage(product: { slug?: string; name?: string; image_u
     return 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=compress&cs=tinysrgb&w=800'
   }
 
+  // Proxy IPv4 (Private / Share)
+  if (name.includes('proxy') || slug.includes('proxy')) {
+    // Ảnh hệ thống máy chủ mạng proxy tốc độ cao
+    return 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=compress&cs=tinysrgb&w=800'
+  }
+
   // CapCut Pro
   if (name.includes('capcut') || slug.includes('capcut')) {
     // Ảnh CapCut Pro video editing chính thức
@@ -153,6 +156,21 @@ export function getProductImage(product: { slug?: string; name?: string; image_u
   }
 
   return product.image_url || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=compress&cs=tinysrgb&w=800'
+}
+
+/** Tính phần trăm giảm giá tâm lý (giá gốc gạch ngang vs giá bán) */
+export function getDiscountPercent(price: number, originalPrice?: number): number {
+  const orig = originalPrice || Math.round((price * 1.8) / 1000) * 1000
+  if (orig <= price) return 40
+  return Math.min(90, Math.max(10, Math.round(((orig - price) / orig) * 100)))
+}
+
+/** Lấy giá gốc (đảm bảo ít nhất gấp 1.5 lần giá bán để làm nổi bật khuyến mãi) */
+export function getOriginalPrice(price: number, originalPrice?: number): number {
+  if (originalPrice && originalPrice >= price * 1.3) {
+    return originalPrice
+  }
+  return Math.round((price * 1.9) / 1000) * 1000
 }
 
 /** Kiểm tra sản phẩm có cần khách điền địa chỉ Gmail để nâng cấp không */

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { X, Clock, Mail, Tag, Shield, FileText, ShoppingBag, ShoppingCart, Plus, Minus, Check } from 'lucide-react'
+import { X, Clock, Mail, Tag, Shield, FileText, ShoppingBag, ShoppingCart, Plus, Minus, Check, MessageCircle } from 'lucide-react'
 import type { Product } from '@/types'
 import {
   formatVND,
@@ -9,6 +9,8 @@ import {
   STOCK_COLORS,
   formatProductName,
   getProductImage,
+  getDiscountPercent,
+  getOriginalPrice,
 } from '@/lib/utils'
 import { useCart } from '@/context/CartContext'
 
@@ -34,6 +36,8 @@ export default function ProductDetailModal({ product, onClose }: Props) {
 
   const displayName = formatProductName(product)
   const displayImg = getProductImage(product)
+  const originalPrice = getOriginalPrice(product.price, product.original_price)
+  const discountPercent = getDiscountPercent(product.price, originalPrice)
 
   const handleAddToCart = () => {
     addToCart(product, qty)
@@ -60,24 +64,45 @@ export default function ProductDetailModal({ product, onClose }: Props) {
         <div className="relative h-60 sm:h-72 overflow-hidden rounded-t-2xl bg-night-950">
           <img src={displayImg} alt={displayName} className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-night-900 via-night-900/30 to-transparent" />
+
+          {/* Nút đóng */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 left-4 z-20 w-10 h-10 rounded-full bg-night-900/80 backdrop-blur-md flex items-center justify-center text-white hover:bg-night-900 transition-colors"
+          >
+            <X className="w-6 h-6" />
+          </button>
+
+          {/* 1. TRÊN CÙNG BÊN TRÁI (kế nút đóng): Tỷ lệ giảm giá */}
+          <div className="absolute top-4 left-16 z-10">
+            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-rose-600/95 backdrop-blur-md text-white font-extrabold text-xs sm:text-sm border border-rose-400/50 shadow-lg shadow-rose-950/70">
+              <span>🔥</span>
+              <span>-{discountPercent}%</span>
+            </span>
+          </div>
+
+          {/* 2. TRÊN CÙNG BÊN PHẢI: Tag nhóm */}
           {product.badge && (
-            <div className="absolute top-4 right-4">
+            <div className="absolute top-4 right-4 z-10">
               <span className={`text-sm font-bold px-4 py-1.5 rounded-full shadow-lg ${BADGE_COLORS[product.badge]}`}>
                 {BADGE_LABELS[product.badge]}
               </span>
             </div>
           )}
-          <button
-            onClick={onClose}
-            className="absolute top-4 left-4 w-10 h-10 rounded-full bg-night-900/70 backdrop-blur-md flex items-center justify-center text-white hover:bg-night-900 transition-colors"
-          >
-            <X className="w-6 h-6" />
-          </button>
 
-          {/* Thời hạn sử dụng trực tiếp trên ảnh */}
+          {/* 3. DƯỚI CÙNG BÊN TRÁI: Tình trạng hàng */}
+          <div className="absolute bottom-4 left-4 z-10">
+            <span
+              className={`text-xs font-semibold px-3 py-1.5 rounded-full bg-night-950/90 backdrop-blur-md border border-white/10 ${STOCK_COLORS[product.stock_status]}`}
+            >
+              {STOCK_LABELS[product.stock_status]}
+            </span>
+          </div>
+
+          {/* 4. DƯỚI CÙNG BÊN PHẢI: Thời hạn sử dụng trực tiếp trên ảnh */}
           {product.duration && (
-            <div className="absolute bottom-4 right-4">
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-night-950/85 backdrop-blur-md border border-gold-400/50 text-gold-300 font-extrabold text-sm shadow-xl">
+            <div className="absolute bottom-4 right-4 z-10">
+              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-night-950/90 backdrop-blur-md border border-gold-400/50 text-gold-300 font-extrabold text-sm shadow-xl">
                 <Clock className="w-4 h-4 text-gold-400" />
                 <span>Thời hạn: {product.duration}</span>
               </span>
@@ -96,14 +121,29 @@ export default function ProductDetailModal({ product, onClose }: Props) {
                 </span>
               )}
             </div>
-            <div className="sm:text-right flex-shrink-0">
+            <div className="sm:text-right flex-shrink-0 space-y-1">
+              <div className="flex items-center sm:justify-end gap-2 text-xs">
+                <span className="text-gray-400">Giá gốc:</span>
+                <span className="line-through text-gray-400 font-mono text-sm">
+                  {formatVND(originalPrice)}
+                </span>
+                <span className="text-rose-400 font-bold bg-rose-500/15 border border-rose-500/30 px-2 py-0.5 rounded">
+                  -{discountPercent}%
+                </span>
+              </div>
               <div className="font-display text-3xl font-bold text-gold-300 text-glow-gold">
                 {formatVND(product.price)}
               </div>
-              <div className={`text-sm font-semibold mt-1 ${STOCK_COLORS[product.stock_status]}`}>
+              <div className={`text-sm font-semibold ${STOCK_COLORS[product.stock_status]}`}>
                 {STOCK_LABELS[product.stock_status]}
               </div>
             </div>
+          </div>
+
+          {/* Dòng ghi chú mua nhiều ib chủ shop */}
+          <div className="text-sm text-mystic-200 bg-mystic-500/15 border border-mystic-400/30 p-3 rounded-xl flex items-center gap-2.5">
+            <MessageCircle className="w-4 h-4 text-gold-400 flex-shrink-0" />
+            <span>Nếu mua nhiều thì inbox chủ shop qua Zalo hoặc Telegram để nhận giá ưu đãi tốt nhất!</span>
           </div>
 
           {/* Meta grid */}
@@ -183,40 +223,44 @@ export default function ProductDetailModal({ product, onClose }: Props) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={handleAddToCart}
-                disabled={product.stock_status === 'out_of_stock'}
-                className={`py-3.5 px-4 rounded-xl font-bold text-base flex items-center justify-center gap-2 border transition-all ${
-                  added
-                    ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300'
-                    : 'btn-outline text-mystic-200 border-mystic-400/40 hover:bg-mystic-500/15'
-                }`}
-              >
-                {added ? (
-                  <>
-                    <Check className="w-5 h-5 text-emerald-400" />
-                    <span>Đã thêm vào giỏ!</span>
-                  </>
-                ) : (
-                  <>
-                    <ShoppingCart className="w-5 h-5 text-gold-400" />
-                    <span>Thêm vào giỏ ({formatVND(product.price * qty)})</span>
-                  </>
-                )}
-              </button>
+            {product.stock_status === 'out_of_stock' ? (
+              <div className="py-4 px-4 rounded-xl text-center text-base font-bold bg-night-900 border border-red-500/40 text-red-300">
+                Sản phẩm hiện đang tạm hết hàng. Quý khách vui lòng liên hệ Admin để đặt trước!
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={handleAddToCart}
+                  className={`py-3.5 px-4 rounded-xl font-bold text-base flex items-center justify-center gap-2 border transition-all ${
+                    added
+                      ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300'
+                      : 'btn-outline text-mystic-200 border-mystic-400/40 hover:bg-mystic-500/15'
+                  }`}
+                >
+                  {added ? (
+                    <>
+                      <Check className="w-5 h-5 text-emerald-400" />
+                      <span>Đã thêm vào giỏ!</span>
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart className="w-5 h-5 text-gold-400" />
+                      <span>Thêm vào giỏ ({formatVND(product.price * qty)})</span>
+                    </>
+                  )}
+                </button>
 
-              <button
-                type="button"
-                onClick={handleBuyNow}
-                disabled={product.stock_status === 'out_of_stock'}
-                className="btn-primary py-3.5 px-4 font-bold text-base flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(139,92,246,0.4)] disabled:opacity-40"
-              >
-                <ShoppingBag className="w-5 h-5" />
-                <span>MUA NGAY</span>
-              </button>
-            </div>
+                <button
+                  type="button"
+                  onClick={handleBuyNow}
+                  className="btn-primary py-3.5 px-4 font-bold text-base flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(139,92,246,0.4)]"
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                  <span>MUA NGAY</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

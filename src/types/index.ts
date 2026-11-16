@@ -21,6 +21,7 @@ export interface Product {
   product_type: string | null
   duration: string | null
   price: number
+  original_price?: number
   delivery_mode: string | null
   description: string | null
   warranty_note: string | null
